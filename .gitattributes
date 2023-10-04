@@ -1,0 +1,7 @@
+# Set eol=lf for linux files
+
+# Source files
+# ============
+*.sh text eol=lf
+*.yml text eol=lf
+*.xml text eol=lf

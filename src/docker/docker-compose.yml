@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.0.1
+    ports:
+      - 8452:8080
+    environment:
+      - KEYCLOAK_LOGLEVEL=DEBUG
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=password
+      - KEYCLOAK_IMPORT=/tmp/realm.json
+    entrypoint: [ "/tmp/docker-compose-entrypoint.sh", "start-dev" ]
+    volumes:
+      - ./keycloak-realm:/tmp
+
+  authentication-nestjs-poc:
+    build: ../../
+    image: authentication-nestjs-poc:0.0.1
+    working_dir: /usr/app/
+    ports:
+      - 0.0.0.0:8080:8080
+    depends_on:
+      - keycloak
+      - mongo
+
+  mongo:
+    image: mongo:7.0.1
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
