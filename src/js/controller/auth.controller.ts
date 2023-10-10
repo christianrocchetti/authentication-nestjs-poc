@@ -1,4 +1,4 @@
-import { Controller, Headers, Post, Req } from '@nestjs/common';
+import { Controller, Delete, Headers, Post, Req } from "@nestjs/common";
 import { LoginService } from '../service/user-login.service';
 import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
 import { AuthorizationGuard } from './validator/authorization.guard';
@@ -18,5 +18,12 @@ export class AuthController {
         const password = credentials[1];
         const logUserData = UserLogDataMapper.convertFromLogUserDataDTO(req);
         return await this.loginService.login(username, password, logUserData);
+    }
+
+
+    @Delete('/token')
+    @UseGuards(AuthorizationGuard)
+    async userLogout(@Headers('authorization') accessToken: string, @Req() req: Request) {
+        return null;
     }
 }

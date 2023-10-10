@@ -49,6 +49,5 @@ export class AppModule {
 
     constructor() {
         this.log.log(`File env used: ${FILE_ENV}`);
-        this.log.log(`mongo uri: ${MongoConfig().URI_MONGO}`);
     }
 }

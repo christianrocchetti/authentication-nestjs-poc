@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from "@nestjs/common";
 import { UserLogData } from '../model/log-user-data.servicereq';
 import { LoginLogDao } from './login-log.dao';
 import { UserLogDataMapper } from '../mapper/log-user-data-dto.mapper';
@@ -11,6 +11,8 @@ import { UserLogDataDto } from '../model/user-log-data-dto';
 
 @Injectable()
 export class LoginService {
+    private readonly log = new Logger(LoginService.name);
+
     constructor(
         private readonly loginLogDao: LoginLogDao,
         private readonly userGetTokenService: UserGetTokenService,
