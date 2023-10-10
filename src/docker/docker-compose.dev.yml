@@ -20,13 +20,3 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
-
-  authentication-nestjs-poc:
-    build: ../../
-    image: authentication-nestjs-poc:0.0.1
-    working_dir: /usr/app/
-    ports:
-      - 0.0.0.0:8080:8080
-    depends_on:
-      - keycloak
-      - mongo

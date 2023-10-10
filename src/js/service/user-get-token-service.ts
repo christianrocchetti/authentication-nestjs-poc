@@ -1,18 +1,21 @@
 import keycloakConf from '../property/keycloak';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import got, { HTTPError } from 'got';
+import { HTTPError } from 'got';
 import { plainToInstance } from 'class-transformer';
 import { UserTokenResponse } from '../model/user-token.response';
 import { KeycloakConf, KeycloakFactoryConf } from '../property/keycloak-factory.conf';
 import { KeycloakRealm } from '../model/keycloak-realm.enum';
 import { NotFoundException } from '../exception/user-not-found.exception';
-import { KeycloakTokenResponse } from "../model/keycloak-token.response";
+import { HttpService } from './http.service';
 
 @Injectable()
 export class UserGetTokenService {
     private readonly log: Logger = new Logger(UserGetTokenService.name);
 
-    constructor(private readonly keycloakFactoryConf: KeycloakFactoryConf) {}
+    constructor(
+        private readonly keycloakFactoryConf: KeycloakFactoryConf,
+        private readonly httpService: HttpService,
+    ) {}
 
     public async getToken(
         username: string,
@@ -32,14 +35,14 @@ export class UserGetTokenService {
         const endpoint: string = `${keycloakRealm.url}/protocol/openid-connect/token`;
 
         try {
-            const response: KeycloakTokenResponse = await got
-                .post(endpoint, {
-                    body: data.toString(),
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                })
-                .json();
+            let response: UserTokenResponse = await this.httpService.makeRequest(endpoint, {
+                method: 'POST',
+                body: data.toString(),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
+
             const userTokenResponse: UserTokenResponse = plainToInstance(
                 UserTokenResponse,
                 response,
