@@ -14,6 +14,7 @@ export class LoginService {
     constructor(
         private readonly loginLogDao: LoginLogDao,
         private readonly userGetTokenService: UserGetTokenService,
+        private readonly userLogDataMapper: UserLogDataMapper,
     ) {}
 
     async login(
@@ -21,7 +22,7 @@ export class LoginService {
         password: string,
         logUserData: UserLogData,
     ): Promise<BaseResponseInterface> {
-        const logUserDataDTO: UserLogDataDto = UserLogDataMapper.convertFromLogUserData(
+        const logUserDataDTO: UserLogDataDto = this.userLogDataMapper.convertToUserLogDataDto(
             logUserData,
             username,
         );

@@ -3,8 +3,8 @@ import { KeycloakFactoryConf } from '../property/keycloak-factory.conf';
 import { UserGetTokenService } from './user-get-token-service';
 import keycloakConf from '../property/keycloak';
 import { KeycloakRealm } from '../model/keycloak-realm.enum';
-import got from 'got';
 import { UserTokenResponse } from '../model/user-token.response';
+import { HttpService } from './http.service';
 
 @Injectable()
 export class RegistrationService {
@@ -12,7 +12,8 @@ export class RegistrationService {
 
     constructor(
         private readonly keycloakFactoryConf: KeycloakFactoryConf,
-        private userGetTokenService: UserGetTokenService,
+        private readonly userGetTokenService: UserGetTokenService,
+        private readonly httpService: HttpService,
     ) {}
 
     async createUser(email: string, password: string) {
@@ -43,7 +44,9 @@ export class RegistrationService {
         });
 
         try {
-            const response = await got.post(keycloakConf().URL_KEYCLOAK_REALM_ADMIN + '/users', {
+            const url: string = keycloakConf().URL_KEYCLOAK_REALM_ADMIN + '/users';
+            await this.httpService.makeRequest(url, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${keycloakTokenResponse.accessToken}`,
