@@ -1,12 +1,13 @@
-import keycloakConf from '../property/keycloak';
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import keycloakConf from '../../property/keycloak';
+import { Injectable, Logger } from '@nestjs/common';
 import { HTTPError } from 'got';
 import { plainToInstance } from 'class-transformer';
-import { UserTokenResponse } from '../model/user-token.response';
-import { KeycloakConf, KeycloakFactoryConf } from '../property/keycloak-factory.conf';
-import { KeycloakRealm } from '../model/keycloak-realm.enum';
-import { NotFoundException } from '../exception/user-not-found.exception';
-import { HttpService } from './http.service';
+import { UserTokenResponse } from '../../model/user-token.response';
+import { KeycloakConf, KeycloakFactoryConf } from '../../property/keycloak-factory.conf';
+import { KeycloakRealm } from '../../model/keycloak-realm.enum';
+import { NotFoundException } from '../../exception/user-not-found.exception';
+import { HttpService } from '../http.service';
+import { MsInternalServerErrorException } from '../../exception/ms-internal-server-error.exception';
 
 @Injectable()
 export class UserGetTokenService {
@@ -55,7 +56,7 @@ export class UserGetTokenService {
             if (err instanceof HTTPError && err.response.statusCode === 401) {
                 throw new NotFoundException(err);
             }
-            throw new InternalServerErrorException(err);
+            throw new MsInternalServerErrorException(err);
         }
     }
 }

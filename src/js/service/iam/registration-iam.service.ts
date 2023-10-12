@@ -1,14 +1,17 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import { KeycloakFactoryConf } from '../property/keycloak-factory.conf';
+import { Injectable, Logger } from '@nestjs/common';
+import { KeycloakFactoryConf } from '../../property/keycloak-factory.conf';
 import { UserGetTokenService } from './user-get-token-service';
-import keycloakConf from '../property/keycloak';
-import { KeycloakRealm } from '../model/keycloak-realm.enum';
-import { UserTokenResponse } from '../model/user-token.response';
-import { HttpService } from './http.service';
+import keycloakConf from '../../property/keycloak';
+import { KeycloakRealm } from '../../model/keycloak-realm.enum';
+import { UserTokenResponse } from '../../model/user-token.response';
+import { HttpService } from '../http.service';
+import { HTTPError } from 'got';
+import { MsInternalServerErrorException } from '../../exception/ms-internal-server-error.exception';
+import { AlreadyRegisteredUserException } from '../../exception/already-registered-user.exception';
 
 @Injectable()
-export class RegistrationService {
-    private readonly log = new Logger(RegistrationService.name);
+export class RegistrationIamService {
+    private readonly log = new Logger(RegistrationIamService.name);
 
     constructor(
         private readonly keycloakFactoryConf: KeycloakFactoryConf,
@@ -55,7 +58,10 @@ export class RegistrationService {
                 responseType: 'json',
             });
         } catch (err) {
-            throw new InternalServerErrorException(err);
+            if (err instanceof HTTPError && err.response.statusCode === 409) {
+                throw new AlreadyRegisteredUserException(err);
+            }
+            throw new MsInternalServerErrorException(err);
         }
     }
 }

@@ -1,15 +1,19 @@
-import { Controller, Delete, Headers, Post, Req } from "@nestjs/common";
-import { LoginService } from '../service/user-login.service';
+import { Body, Controller, Delete, Headers, Post, Req } from '@nestjs/common';
+import { LoginService } from '../service/login/user-login.service';
 import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
 import { AuthorizationGuard } from './validator/authorization.guard';
 import { UserLogDataMapper } from '../mapper/log-user-data-dto.mapper';
 import { UserLogData } from '../model/log-user-data.servicereq';
+import { TokenBodyValid } from './validator/token-body.valid';
+import { UserLogoutService } from '../service/logout/user-logout.service';
+import { AccessTokenGuard } from './validator/access-token.guard';
 
 @Controller('/auth/user')
 export class AuthController {
     constructor(
         private readonly loginService: LoginService,
         private readonly userLogDataMapper: UserLogDataMapper,
+        private readonly userLogoutService: UserLogoutService,
     ) {}
 
     @Post('/token')
@@ -24,10 +28,12 @@ export class AuthController {
         return await this.loginService.login(username, password, logUserData);
     }
 
-
     @Delete('/token')
-    @UseGuards(AuthorizationGuard)
-    async userLogout(@Headers('authorization') accessToken: string, @Req() req: Request) {
-        return null;
+    @UseGuards(AuthorizationGuard, AccessTokenGuard)
+    async userLogout(
+        @Headers('authorization') authorization: string,
+        @Body() body: TokenBodyValid,
+    ) {
+        return this.userLogoutService.logout(body.refreshToken);
     }
 }
